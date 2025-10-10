@@ -40,18 +40,49 @@ int main() {
     float gravidade = 2.0f;
     float impulso_pulo = -50.0f;
     int lado = 1;
-
-    // Variáveis do Personagem
-    //float personagem_y = CHAO_Y; // Posição Y atual
-    float pos_dy = 0.0;  // Velocidade vertical atual
+    float pos_dy = 0.0;
     bool is_jumping = false;
 
     while (true) {
         ALLEGRO_EVENT event;
         al_wait_for_event(event_queue, &event);
 
+        if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+            break;
+        }
+        else if (event.keyboard.keycode == ALLEGRO_KEY_RIGHT) {
+            lado = 1;
+            current_frame_y = 0;
+
+            if (pos_x >= 1116) {
+                pos_x -= 16;
+            }
+            else {
+                pos_x += 20;
+            }
+            frame += .4f;
+            if (frame > 8) {
+                frame -= 8;
+            }
+        }
+
+        else if (event.keyboard.keycode == ALLEGRO_KEY_LEFT) {
+            lado = 0;
+            current_frame_y = 160;
+            if (pos_x <= 15) {
+                pos_x += 16;
+            }
+            else {
+                pos_x -= 20;
+            }
+            frame += .4f;
+            if (frame > 8) {
+                frame -= 8;
+            }
+        }
+
+        //************PULO**************
         if (pos_y < 760 || is_jumping) {
-            //personagem_dy += GRAVIDADE;
 			pos_dy = pos_dy + gravidade;
             frame += .2f;
             if (frame > 8) {
@@ -84,46 +115,12 @@ int main() {
             }            
         }
 
-        if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-            break;
-        }
-        else if (event.keyboard.keycode == ALLEGRO_KEY_RIGHT) {
-			lado = 1;
-            current_frame_y = 0;
-            
-            if (pos_x >= 1116) {
-                pos_x -= 16;
-            }
-            else {
-                pos_x += 20;
-            }
-            frame += .4f;
-            if (frame > 8) {
-                frame -= 8;
-            }
-        }
-
-        else if (event.keyboard.keycode == ALLEGRO_KEY_LEFT) {
-            lado = 0;
-            current_frame_y = 160;
-            if (pos_x <= 15) {
-                pos_x += 16;
-            }
-            else {
-				pos_x -= 20;
-            }
-            frame += .4f;
-            if (frame > 8) {
-                frame -= 8;
-            }
-        }
-
         al_clear_to_color(al_map_rgb(255, 255, 255));
         al_draw_bitmap(bg, 0, 0, 0);
         al_draw_bitmap(stone, 100, 840, 0);
         al_draw_bitmap(grass, 400, 860, 0);
         al_draw_bitmap(bush, 700, 840, 0);
-        al_draw_bitmap(cactus,1000, 820, 0);
+        al_draw_bitmap(cactus,1000, 800, 0);
         al_draw_text(font, al_map_rgb(0, 0, 0), 7, 7, 0, "SCORE: Dinno Meteor");
         al_draw_text(font, al_map_rgb(255, 255, 255), 5, 5, 0, "SCORE: Dinno Meteor");
         al_draw_bitmap_region(sprite, 160 * (int)frame, current_frame_y, 160, 160, pos_x, pos_y, 0);

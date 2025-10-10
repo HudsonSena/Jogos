@@ -5,9 +5,6 @@
 #include <allegro5/keyboard.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
-//  573 / 3 = 191 → largura
-// 644 / 4 = 161  → altura
-
 
 int main() {
 
@@ -18,20 +15,20 @@ int main() {
     al_install_keyboard();
 
     ALLEGRO_DISPLAY* display = al_create_display(1280, 920);
+
     al_set_window_position(display, 300, 100);
     al_set_window_title(display, "Dinno Meteor");
+
     ALLEGRO_FONT* font = al_load_font("./assets/font.ttf", 25, 0);
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / 30.0);
-
     ALLEGRO_BITMAP* sprite = al_load_bitmap("./assets/dinno.png");
     ALLEGRO_BITMAP* bg = al_load_bitmap("./assets/bg.png");
     ALLEGRO_BITMAP* stone = al_load_bitmap("./assets/Stone.png");
     ALLEGRO_BITMAP* grass = al_load_bitmap("./assets/Grass.png");
     ALLEGRO_BITMAP* cactus = al_load_bitmap("./assets/Cactus.png");
     ALLEGRO_BITMAP* bush = al_load_bitmap("./assets/Bush.png");
-
-
     ALLEGRO_EVENT_QUEUE* event_queue = al_create_event_queue();
+
     al_register_event_source(event_queue, al_get_display_event_source(display));
     al_register_event_source(event_queue, al_get_timer_event_source(timer));
     al_register_event_source(event_queue, al_get_keyboard_event_source());
@@ -84,8 +81,7 @@ int main() {
                 if (lado == 1) {
                     current_frame_y = 320;
                 } else current_frame_y = 480;
-            }
-            
+            }            
         }
 
         if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
@@ -94,9 +90,14 @@ int main() {
         else if (event.keyboard.keycode == ALLEGRO_KEY_RIGHT) {
 			lado = 1;
             current_frame_y = 0;
-            pos_x += 16;
-			if (pos_x >= 1100) pos_x -= 20;
-            frame += 1.2f;
+            
+            if (pos_x >= 1116) {
+                pos_x -= 16;
+            }
+            else {
+                pos_x += 20;
+            }
+            frame += .4f;
             if (frame > 8) {
                 frame -= 8;
             }
@@ -105,13 +106,16 @@ int main() {
         else if (event.keyboard.keycode == ALLEGRO_KEY_LEFT) {
             lado = 0;
             current_frame_y = 160;
-            pos_x -= 16;
-            if (pos_x <= 0) pos_x += 20;  
-            frame += 1.2f;
+            if (pos_x <= 15) {
+                pos_x += 16;
+            }
+            else {
+				pos_x -= 20;
+            }
+            frame += .4f;
             if (frame > 8) {
                 frame -= 8;
             }
-            
         }
 
         al_clear_to_color(al_map_rgb(255, 255, 255));

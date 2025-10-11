@@ -6,6 +6,28 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 
+int fmeteor(int y) {
+    float pos_meteor_dy = 0.0;
+	float gravidade = 2.0f;
+
+    //Queda meteoro*****
+    if (y < 760) {
+        pos_meteor_dy += gravidade;
+    }
+
+    y += pos_meteor_dy;
+
+
+    if (y >= 760) {
+        //personagem_y = CHAO_Y; // Garante que ele não passe do chão
+        y = 0;
+        //personagem_dy = 0.0f;  // Zera a velocidade vertical
+        pos_meteor_dy = 0.0f;
+    }
+	return y;
+    //al_draw_bitmap_region(meteor, 192, 156, 192, 156, pos_meteor_x, pos_meteor_y, 1);
+}
+
 int main() {
 
     al_init();
@@ -22,6 +44,7 @@ int main() {
     ALLEGRO_FONT* font = al_load_font("./assets/font.ttf", 25, 0);
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / 30.0);
     ALLEGRO_BITMAP* sprite = al_load_bitmap("./assets/dinno.png");
+    ALLEGRO_BITMAP* meteor = al_load_bitmap("./assets/meteor.png");
     ALLEGRO_BITMAP* bg = al_load_bitmap("./assets/bg.png");
     ALLEGRO_BITMAP* stone = al_load_bitmap("./assets/Stone.png");
     ALLEGRO_BITMAP* grass = al_load_bitmap("./assets/Grass.png");
@@ -35,17 +58,21 @@ int main() {
     al_start_timer(timer);
 
     float frame = 0.f;
-    int pos_x = 0, pos_y = 760;
+    int pos_x = 0, pos_y = 720;
+    int pos_meteor_x = 0;
+	int pos_meteor_y = 0;
     int current_frame_y = 160;
     float gravidade = 2.0f;
     float impulso_pulo = -50.0f;
     int lado = 1;
     float pos_dy = 0.0;
     bool is_jumping = false;
+    
 
     while (true) {
         ALLEGRO_EVENT event;
         al_wait_for_event(event_queue, &event);
+        
 
         if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
             break;
@@ -60,7 +87,7 @@ int main() {
             else {
                 pos_x += 20;
             }
-            frame += .4f;
+            frame += .6f;
             if (frame > 8) {
                 frame -= 8;
             }
@@ -75,7 +102,7 @@ int main() {
             else {
                 pos_x -= 20;
             }
-            frame += .4f;
+            frame += .6f;
             if (frame > 8) {
                 frame -= 8;
             }
@@ -92,7 +119,7 @@ int main() {
 
         // 2. ATUALIZAR POSIÇÃO
         //personagem_y += personagem_dy;
-		pos_y = pos_y + pos_dy;
+		pos_y += pos_dy;
 
         // 3. COLISÃO COM O CHÃO
         if (pos_y >= 760) {
@@ -115,6 +142,8 @@ int main() {
             }            
         }
 
+        int pos_meteor_y_f = fmeteor(pos_meteor_y);
+
         al_clear_to_color(al_map_rgb(255, 255, 255));
         al_draw_bitmap(bg, 0, 0, 0);
         al_draw_bitmap(stone, 100, 840, 0);
@@ -124,12 +153,17 @@ int main() {
         al_draw_text(font, al_map_rgb(0, 0, 0), 7, 7, 0, "SCORE: Dinno Meteor");
         al_draw_text(font, al_map_rgb(255, 255, 255), 5, 5, 0, "SCORE: Dinno Meteor");
         al_draw_bitmap_region(sprite, 160 * (int)frame, current_frame_y, 160, 160, pos_x, pos_y, 0);
+        al_draw_bitmap(meteor, pos_meteor_x, pos_meteor_y_f, 0);
         al_flip_display();
     }
 
     al_destroy_bitmap(bg);
     al_destroy_bitmap(sprite);
     al_destroy_font(font);
+    al_destroy_bitmap(stone);
+    al_destroy_bitmap(grass);
+    al_destroy_bitmap(bush);
+    al_destroy_bitmap(cactus);
     al_destroy_display(display);
     al_destroy_event_queue(event_queue);
 

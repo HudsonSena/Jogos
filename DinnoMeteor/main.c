@@ -5,6 +5,7 @@
 #include <allegro5/keyboard.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
+#include <stdio.h>
 
 int fmeteor(int y) {
     float pos_meteor_dy = 0.0;
@@ -27,6 +28,14 @@ int fmeteor(int y) {
 	return y;
     //al_draw_bitmap_region(meteor, 192, 156, 192, 156, pos_meteor_x, pos_meteor_y, 1);
 }
+
+void menu(void *font) {
+    //menu do jogo
+    al_clear_to_color(al_map_rgb(255, 255, 255));
+    al_draw_text(font, al_map_rgb(0, 0, 0), 12, 12, 0, "======= Menu =======");
+    al_draw_text(font, al_map_rgb(255, 255, 255), 10, 10, 0, "======= Menu =======");
+}
+
 
 int main() {
 
@@ -67,12 +76,13 @@ int main() {
     int lado = 1;
     float pos_dy = 0.0;
     bool is_jumping = false;
+
+    menu(font);
     
 
     while (true) {
         ALLEGRO_EVENT event;
         al_wait_for_event(event_queue, &event);
-        
 
         if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
             break;
@@ -130,6 +140,9 @@ int main() {
             is_jumping = false;    // Não está mais pulando
         }
 
+        
+		
+
         if (event.keyboard.keycode == ALLEGRO_KEY_SPACE || event.keyboard.keycode == ALLEGRO_KEY_UP) {
             // Só permite pular se estiver no chão
             if (pos_y == 760 && !is_jumping) {
@@ -150,10 +163,10 @@ int main() {
         al_draw_bitmap(grass, 400, 860, 0);
         al_draw_bitmap(bush, 700, 840, 0);
         al_draw_bitmap(cactus,1000, 800, 0);
-        al_draw_text(font, al_map_rgb(0, 0, 0), 7, 7, 0, "SCORE: Dinno Meteor");
-        al_draw_text(font, al_map_rgb(255, 255, 255), 5, 5, 0, "SCORE: Dinno Meteor");
+        al_draw_text(font, al_map_rgb(0, 0, 0), 7, 7, 0, "Score");
+        al_draw_text(font, al_map_rgb(255, 255, 255), 5, 5, 0, "Score");
         al_draw_bitmap_region(sprite, 160 * (int)frame, current_frame_y, 160, 160, pos_x, pos_y, 0);
-        al_draw_bitmap(meteor, pos_meteor_x, pos_meteor_y_f, 0);
+        //al_draw_bitmap(meteor, pos_meteor_x, pos_meteor_y_f, 0);
         al_flip_display();
     }
 

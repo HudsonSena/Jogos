@@ -77,7 +77,7 @@ int main() {
     float pos_dy = 0.0;
     bool is_jumping = false;
 	float time_pulo = 0.0f;
-	float maxtime_pulo = 1.5f;
+	float maxtime_pulo = 1.0f;
 
     menu(font);
     
@@ -171,7 +171,7 @@ int main() {
         al_draw_text(font, al_map_rgb(0, 0, 0), 7, 7, 0, "Score");
         al_draw_text(font, al_map_rgb(255, 255, 255), 5, 5, 0, "Score");
         al_draw_bitmap_region(sprite, 160 * (int)frame, current_frame_y, 160, 160, pos_x, pos_y, 0);
-        al_draw_bitmap(meteor, pos_meteor_x, pos_meteor_y_f, 0);
+        //al_draw_bitmap(meteor, pos_meteor_x, pos_meteor_y_f, 0);
         al_flip_display();
     }
 

@@ -76,6 +76,8 @@ int main() {
     int lado = 1;
     float pos_dy = 0.0;
     bool is_jumping = false;
+	float time_pulo = 0.0f;
+	float maxtime_pulo = 1.5f;
 
     menu(font);
     
@@ -143,7 +145,7 @@ int main() {
         
 		
 
-        if (event.keyboard.keycode == ALLEGRO_KEY_SPACE || event.keyboard.keycode == ALLEGRO_KEY_UP) {
+        if ((event.keyboard.keycode == ALLEGRO_KEY_SPACE || event.keyboard.keycode == ALLEGRO_KEY_UP) && time_pulo > maxtime_pulo) {
             // Só permite pular se estiver no chão
             if (pos_y == 760 && !is_jumping) {
                 //personagem_dy = IMPULSO_PULO; // Dá o impulso para cima
@@ -153,9 +155,12 @@ int main() {
                     current_frame_y = 320;
                 } else current_frame_y = 480;
             }            
+			time_pulo = 0;
         }
 
         int pos_meteor_y_f = fmeteor(pos_meteor_y);
+
+		time_pulo += 1.0f / 30.0f;
 
         al_clear_to_color(al_map_rgb(255, 255, 255));
         al_draw_bitmap(bg, 0, 0, 0);
@@ -166,7 +171,7 @@ int main() {
         al_draw_text(font, al_map_rgb(0, 0, 0), 7, 7, 0, "Score");
         al_draw_text(font, al_map_rgb(255, 255, 255), 5, 5, 0, "Score");
         al_draw_bitmap_region(sprite, 160 * (int)frame, current_frame_y, 160, 160, pos_x, pos_y, 0);
-        //al_draw_bitmap(meteor, pos_meteor_x, pos_meteor_y_f, 0);
+        al_draw_bitmap(meteor, pos_meteor_x, pos_meteor_y_f, 0);
         al_flip_display();
     }
 

@@ -7,10 +7,21 @@
 #include <allegro5/allegro_acodec.h>
 #include <stdio.h>
 
-void menu(ALLEGRO_FONT* font) {
-    //menu do jogo
-    al_draw_text(font, al_map_rgb(0, 0, 0), 12, 12, 0, "======= Menu =======");
-    al_draw_text(font, al_map_rgb(255, 255, 255), 10, 10, 0, "======= Menu =======");
+void meteoro(ALLEGRO_BITMAP* meteor) {
+    float frame = 0.f;
+    while(true) {
+        frame += .2f;
+            if (frame > 3) {
+                frame -= 3;
+            }
+    }
+    int current_frame_y = 0;
+    //al_draw_bitmap_region(meteor, 0, current_frame_y, 208.3, 195, 200, 200, 0);
+    al_draw_bitmap_region(meteor, 208.3 * (int)frame, current_frame_y, 208.3, 190, 200, 200, 0);
+}
+
+void menu(ALLEGRO_BITMAP* menu) {
+    al_draw_bitmap(menu, 300, 200, 0);
 }
 
 
@@ -27,6 +38,7 @@ int main() {
     al_set_window_position(display, 300, 100);
     al_set_window_title(display, "Dinno Meteor");
 
+    ALLEGRO_BITMAP* menuimg = al_load_bitmap("./assets/menu.png");
     ALLEGRO_FONT* font = al_load_font("./assets/font.ttf", 25, 0);
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / 30.0);
     ALLEGRO_BITMAP* sprite = al_load_bitmap("./assets/dinno.png");
@@ -115,9 +127,6 @@ int main() {
             is_jumping = false;    // N�o est� mais pulando
         }
 
-
-
-
         if ((event.keyboard.keycode == ALLEGRO_KEY_SPACE || event.keyboard.keycode == ALLEGRO_KEY_UP) && time_pulo > maxtime_pulo) {
             // S� permite pular se estiver no ch�o
             if (pos_y == 760 && !is_jumping) {
@@ -137,11 +146,12 @@ int main() {
 
         al_clear_to_color(al_map_rgb(255, 255, 255));
         al_draw_bitmap(bg, 0, 0, 0);
+        //menu(menuimg);
         al_draw_bitmap(stone, 100, 840, 0);
         al_draw_bitmap(grass, 400, 860, 0);
         al_draw_bitmap(bush, 700, 840, 0);
         al_draw_bitmap(cactus, 1000, 800, 0);
-        menu(font);
+        meteoro(meteor);
         al_draw_text(font, al_map_rgb(0, 0, 0), 7, 7, 0, "Score");
         al_draw_text(font, al_map_rgb(255, 255, 255), 5, 5, 0, "Score");
         al_draw_bitmap_region(sprite, 160 * (int)frame, current_frame_y, 160, 160, pos_x, pos_y, 0);

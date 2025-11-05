@@ -1,4 +1,4 @@
-Ôªø#include <allegro5/allegro.h>
+?#include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_image.h>
@@ -9,7 +9,7 @@
 
 int fmeteor(int y) {
     float pos_meteor_dy = 0.0;
-	float gravidade = 2.0f;
+    float gravidade = 2.0f;
 
     //Queda meteoro*****
     if (y < 760) {
@@ -20,16 +20,16 @@ int fmeteor(int y) {
 
 
     if (y >= 760) {
-        //personagem_y = CHAO_Y; // Garante que ele n√£o passe do ch√£o
+        //personagem_y = CHAO_Y; // Garante que ele n„o passe do ch„o
         y = 0;
         //personagem_dy = 0.0f;  // Zera a velocidade vertical
         pos_meteor_dy = 0.0f;
     }
-	return y;
+    return y;
     //al_draw_bitmap_region(meteor, 192, 156, 192, 156, pos_meteor_x, pos_meteor_y, 1);
 }
 
-void menu(void *font) {
+void menu(void* font) {
     //menu do jogo
     al_clear_to_color(al_map_rgb(255, 255, 255));
     al_draw_text(font, al_map_rgb(0, 0, 0), 12, 12, 0, "======= Menu =======");
@@ -69,18 +69,18 @@ int main() {
     float frame = 0.f;
     int pos_x = 0, pos_y = 720;
     int pos_meteor_x = 0;
-	int pos_meteor_y = 0;
+    int pos_meteor_y = 0;
     int current_frame_y = 160;
     float gravidade = 2.0f;
     float impulso_pulo = -50.0f;
     int lado = 1;
     float pos_dy = 0.0;
     bool is_jumping = false;
-	float time_pulo = 0.0f;
-	float maxtime_pulo = 1.0f;
+    float time_pulo = 0.0f;
+    float maxtime_pulo = 1.0f;
 
     menu(font);
-    
+
 
     while (true) {
         ALLEGRO_EVENT event;
@@ -122,52 +122,53 @@ int main() {
 
         //************PULO**************
         if (pos_y < 760 || is_jumping) {
-			pos_dy = pos_dy + gravidade;
+            pos_dy = pos_dy + gravidade;
             frame += .2f;
             if (frame > 8) {
                 frame -= 8;
             }
         }
 
-        // 2. ATUALIZAR POSI√á√ÉO
+        // 2. ATUALIZAR POSI«√O
         //personagem_y += personagem_dy;
-		pos_y += pos_dy;
+        pos_y += pos_dy;
 
-        // 3. COLIS√ÉO COM O CH√ÉO
+        // 3. COLIS√O COM O CH√O
         if (pos_y >= 760) {
-            //personagem_y = CHAO_Y; // Garante que ele n√£o passe do ch√£o
+            //personagem_y = CHAO_Y; // Garante que ele n„o passe do ch„o
             pos_y = 760;
             //personagem_dy = 0.0f;  // Zera a velocidade vertical
-			pos_dy = 0.0f;
-            is_jumping = false;    // N√£o est√° mais pulando
+            pos_dy = 0.0f;
+            is_jumping = false;    // N„o est· mais pulando
         }
 
-        
-		
+
+
 
         if ((event.keyboard.keycode == ALLEGRO_KEY_SPACE || event.keyboard.keycode == ALLEGRO_KEY_UP) && time_pulo > maxtime_pulo) {
-            // S√≥ permite pular se estiver no ch√£o
+            // SÛ permite pular se estiver no ch„o
             if (pos_y == 760 && !is_jumping) {
-                //personagem_dy = IMPULSO_PULO; // D√° o impulso para cima
+                //personagem_dy = IMPULSO_PULO; // D· o impulso para cima
                 pos_dy += impulso_pulo;
-                is_jumping = true; // Define que ele est√° no ar
+                is_jumping = true; // Define que ele est· no ar
                 if (lado == 1) {
                     current_frame_y = 320;
-                } else current_frame_y = 480;
-            }            
-			time_pulo = 0;
+                }
+                else current_frame_y = 480;
+            }
+            time_pulo = 0;
         }
 
         int pos_meteor_y_f = fmeteor(pos_meteor_y);
 
-		time_pulo += 1.0f / 30.0f;
+        time_pulo += 1.0f / 30.0f;
 
         al_clear_to_color(al_map_rgb(255, 255, 255));
         al_draw_bitmap(bg, 0, 0, 0);
         al_draw_bitmap(stone, 100, 840, 0);
         al_draw_bitmap(grass, 400, 860, 0);
         al_draw_bitmap(bush, 700, 840, 0);
-        al_draw_bitmap(cactus,1000, 800, 0);
+        al_draw_bitmap(cactus, 1000, 800, 0);
         al_draw_text(font, al_map_rgb(0, 0, 0), 7, 7, 0, "Score");
         al_draw_text(font, al_map_rgb(255, 255, 255), 5, 5, 0, "Score");
         al_draw_bitmap_region(sprite, 160 * (int)frame, current_frame_y, 160, 160, pos_x, pos_y, 0);

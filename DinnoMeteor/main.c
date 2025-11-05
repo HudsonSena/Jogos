@@ -1,4 +1,4 @@
-?#include <allegro5/allegro.h>
+#include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_image.h>
@@ -7,31 +7,8 @@
 #include <allegro5/allegro_acodec.h>
 #include <stdio.h>
 
-int fmeteor(int y) {
-    float pos_meteor_dy = 0.0;
-    float gravidade = 2.0f;
-
-    //Queda meteoro*****
-    if (y < 760) {
-        pos_meteor_dy += gravidade;
-    }
-
-    y += pos_meteor_dy;
-
-
-    if (y >= 760) {
-        //personagem_y = CHAO_Y; // Garante que ele não passe do chão
-        y = 0;
-        //personagem_dy = 0.0f;  // Zera a velocidade vertical
-        pos_meteor_dy = 0.0f;
-    }
-    return y;
-    //al_draw_bitmap_region(meteor, 192, 156, 192, 156, pos_meteor_x, pos_meteor_y, 1);
-}
-
-void menu(void* font) {
+void menu(ALLEGRO_FONT* font) {
     //menu do jogo
-    al_clear_to_color(al_map_rgb(255, 255, 255));
     al_draw_text(font, al_map_rgb(0, 0, 0), 12, 12, 0, "======= Menu =======");
     al_draw_text(font, al_map_rgb(255, 255, 255), 10, 10, 0, "======= Menu =======");
 }
@@ -68,8 +45,6 @@ int main() {
 
     float frame = 0.f;
     int pos_x = 0, pos_y = 720;
-    int pos_meteor_x = 0;
-    int pos_meteor_y = 0;
     int current_frame_y = 160;
     float gravidade = 2.0f;
     float impulso_pulo = -50.0f;
@@ -78,8 +53,6 @@ int main() {
     bool is_jumping = false;
     float time_pulo = 0.0f;
     float maxtime_pulo = 1.0f;
-
-    menu(font);
 
 
     while (true) {
@@ -129,28 +102,28 @@ int main() {
             }
         }
 
-        // 2. ATUALIZAR POSIÇÃO
+        // 2. ATUALIZAR POSIï¿½ï¿½O
         //personagem_y += personagem_dy;
         pos_y += pos_dy;
 
-        // 3. COLISÃO COM O CHÃO
+        // 3. COLISï¿½O COM O CHï¿½O
         if (pos_y >= 760) {
-            //personagem_y = CHAO_Y; // Garante que ele não passe do chão
+            //personagem_y = CHAO_Y; // Garante que ele nï¿½o passe do chï¿½o
             pos_y = 760;
             //personagem_dy = 0.0f;  // Zera a velocidade vertical
             pos_dy = 0.0f;
-            is_jumping = false;    // Não está mais pulando
+            is_jumping = false;    // Nï¿½o estï¿½ mais pulando
         }
 
 
 
 
         if ((event.keyboard.keycode == ALLEGRO_KEY_SPACE || event.keyboard.keycode == ALLEGRO_KEY_UP) && time_pulo > maxtime_pulo) {
-            // Só permite pular se estiver no chão
+            // Sï¿½ permite pular se estiver no chï¿½o
             if (pos_y == 760 && !is_jumping) {
-                //personagem_dy = IMPULSO_PULO; // Dá o impulso para cima
+                //personagem_dy = IMPULSO_PULO; // Dï¿½ o impulso para cima
                 pos_dy += impulso_pulo;
-                is_jumping = true; // Define que ele está no ar
+                is_jumping = true; // Define que ele estï¿½ no ar
                 if (lado == 1) {
                     current_frame_y = 320;
                 }
@@ -159,7 +132,6 @@ int main() {
             time_pulo = 0;
         }
 
-        int pos_meteor_y_f = fmeteor(pos_meteor_y);
 
         time_pulo += 1.0f / 30.0f;
 
@@ -169,6 +141,7 @@ int main() {
         al_draw_bitmap(grass, 400, 860, 0);
         al_draw_bitmap(bush, 700, 840, 0);
         al_draw_bitmap(cactus, 1000, 800, 0);
+        menu(font);
         al_draw_text(font, al_map_rgb(0, 0, 0), 7, 7, 0, "Score");
         al_draw_text(font, al_map_rgb(255, 255, 255), 5, 5, 0, "Score");
         al_draw_bitmap_region(sprite, 160 * (int)frame, current_frame_y, 160, 160, pos_x, pos_y, 0);

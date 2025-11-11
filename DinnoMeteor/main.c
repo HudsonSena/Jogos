@@ -9,15 +9,16 @@
 
 void meteoro(ALLEGRO_BITMAP* meteor) {
     float frame = 0.f;
-    while(true) {
+    /*while(true) {
         frame += .2f;
             if (frame > 3) {
                 frame -= 3;
             }
-    }
+    }*/
     int current_frame_y = 0;
     //al_draw_bitmap_region(meteor, 0, current_frame_y, 208.3, 195, 200, 200, 0);
-    al_draw_bitmap_region(meteor, 208.3 * (int)frame, current_frame_y, 208.3, 190, 200, 200, 0);
+    al_draw_bitmap_region(meteor, 160 * (int)frame, current_frame_y, 160, 160, 200, 200, 0);
+    al_draw_bitmap_region(meteor, 160 * (int)frame, 160, 160, 160, 200, 200, 0);
 }
 
 void menu(ALLEGRO_BITMAP* menu) {
@@ -41,8 +42,8 @@ int main() {
     ALLEGRO_BITMAP* menuimg = al_load_bitmap("./assets/menu.png");
     ALLEGRO_FONT* font = al_load_font("./assets/font.ttf", 25, 0);
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / 30.0);
-    ALLEGRO_BITMAP* sprite = al_load_bitmap("./assets/dinno.png");
-    ALLEGRO_BITMAP* meteor = al_load_bitmap("./assets/meteor.png");
+    ALLEGRO_BITMAP* sprite = al_load_bitmap("./assets/dinopowerRed.png");
+    ALLEGRO_BITMAP* meteor = al_load_bitmap("./assets/meteoroIlustrator.png");
     ALLEGRO_BITMAP* bg = al_load_bitmap("./assets/bg.png");
     ALLEGRO_BITMAP* stone = al_load_bitmap("./assets/Stone.png");
     ALLEGRO_BITMAP* grass = al_load_bitmap("./assets/Grass.png");
@@ -152,6 +153,7 @@ int main() {
         al_draw_bitmap(bush, 700, 840, 0);
         al_draw_bitmap(cactus, 1000, 800, 0);
         meteoro(meteor);
+        //menu(menuimg);
         al_draw_text(font, al_map_rgb(0, 0, 0), 7, 7, 0, "Score");
         al_draw_text(font, al_map_rgb(255, 255, 255), 5, 5, 0, "Score");
         al_draw_bitmap_region(sprite, 160 * (int)frame, current_frame_y, 160, 160, pos_x, pos_y, 0);

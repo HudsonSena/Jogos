@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <allegro5/allegro.h>
+#include <allegro5/allegro_font.h>
 #include "dados.h" 
 
 // --- DEFINIÇÃO/INICIALIZAÇÃO CONCRETA DE VARIÁVEIS GLOBAIS ---
@@ -14,6 +15,7 @@ JOGO_ESTADO estado_atual = ESTADO_MENU;
 ALLEGRO_FONT *font_padrao = NULL; // É inicializada em main, mas declarada aqui
 ALLEGRO_DISPLAY *display = NULL; 
 ALLEGRO_EVENT_QUEUE *event_queue = NULL;
+char mensagem_evento[MAX_MSG_LENGTH] = "Aperte ESPACO para iniciar.";
 
 // Definições de Itens
 Arma todas_as_armas[MAX_ARMAS] = {
@@ -76,8 +78,6 @@ void avancar_passo() {
     if (pos >= TAMANHO_TABULEIRO - 1) { return; }
     
     jogador_principal.posicao_atual = casa->id_proximas_casas[0];
-    
-    processar_evento_casa();
 }
 
 void processar_evento_casa() {
@@ -97,11 +97,11 @@ void processar_evento_casa() {
                  jogador_principal.vida -= dano_sofrido;
             }
 
-            printf("Batalha! Seu Poder: %d. Inimigo Forca: %d. Dano sofrido: %d. HP: %d\n", 
+            sprintf(mensagem_evento, "Batalha! Seu Poder: %d. Inimigo Forca: %d. Dano sofrido: %d. HP: %d\n", 
                    poder_total, forca_inimigo, dano_sofrido, jogador_principal.vida);
 
             if (poder_total > forca_inimigo) {
-                printf("VITORIA! Ganha +5 de poder, 50 moedas.\n");
+                sprintf(mensagem_evento, "VITORIA! Ganha +5 de poder, 50 moedas.\n");
                 jogador_principal.poder_ganho_batalha += 5;
                 jogador_principal.vida += 20; if (jogador_principal.vida > MAX_VIDA) jogador_principal.vida = MAX_VIDA;
                 jogador_principal.moedas += 50;
@@ -112,7 +112,7 @@ void processar_evento_casa() {
                     jogador_principal.num_gemas_inventario++;
                 }
             } else {
-                printf("DERROTA! Consuma gema [G] ou tente novamente [ESPACO].\n");
+                sprintf(mensagem_evento, "DERROTA! Consuma gema [G] ou tente novamente [ESPACO].\n");
                 estado_atual = ESTADO_OPCAO_GEMA;
             }
             if (jogador_principal.vida <= 0) estado_atual = ESTADO_SAIR;
@@ -122,8 +122,7 @@ void processar_evento_casa() {
         case CASA_GEMA:
             jogador_principal.moedas += casa->valor_evento;
             jogador_principal.total_gemas += casa->valor_evento; 
-            printf("GEMA COLETADA! Ganhou %d moedas.\n", casa->valor_evento);
-            jogador_principal.posicao_atual++; 
+            sprintf(mensagem_evento, "GEMA COLETADA! Ganhou %d moedas.\n", casa->valor_evento); 
             break;
         
         case CASA_ARMA: {
@@ -139,19 +138,17 @@ void processar_evento_casa() {
                     jogador_principal.id_arma_equipada = id_nova_arma;
                 }
             }
-            jogador_principal.posicao_atual++; 
             break;
         }
 
         case CASA_VAZIA:
-             printf("Casa vazia. Nada acontece.\n");
+             sprintf(mensagem_evento, "Casa vazia. Nada acontece.\n");
              jogador_principal.vida += casa->valor_evento;
              if (jogador_principal.vida > MAX_VIDA) jogador_principal.vida = MAX_VIDA;
-             jogador_principal.posicao_atual++;
              break;
             
         case CASA_CHEGADA:
-            printf("--- VITORIA FINAL ---\n");
+            sprintf(mensagem_evento, "--- VITORIA FINAL ---\n");
             estado_atual = ESTADO_SAIR;
             break;
     }

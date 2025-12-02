@@ -18,6 +18,7 @@ extern Arma todas_as_armas[MAX_ARMAS];
 extern Gema todas_as_gemas[MAX_GEMAS];
 extern Casa tabuleiro[TAMANHO_TABULEIRO];
 extern Objetivo objetivos[MAX_OBJETIVOS];
+extern char mensagem_evento[MAX_MSG_LENGTH];
 
 // --- CONSTANTES DE I/O ---
 #define NOME_ARQUIVO_SCORES "highscores.dat"

@@ -21,6 +21,7 @@
 #define MAX_ARMAS 5 
 #define MAX_GEMAS 5 
 #define MAX_VIDA 200
+#define MAX_MSG_LENGTH 150
 
 // --- ENUMS DE ESTADO E TIPOS ---
 typedef enum {

@@ -6,12 +6,17 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
-#include "dados.h" 
+#include "dados.h"
 
 // Funções de Desenho
 
 void desenha_tabuleiro(ALLEGRO_FONT *font) {
-    int i; int start_x = 50; int start_y = 100; int cell_size = 80; int spacing = 20; int cells_per_row = 5;
+    int i;
+    int start_x = 50; 
+    int start_y = 100; 
+    int cell_size = 80; 
+    int spacing = 20; 
+    int cells_per_row = 5;
     ALLEGRO_COLOR cor_jogador = al_map_rgb(255, 0, 0);
     ALLEGRO_COLOR cor_base = al_map_rgb(90, 90, 90);
     ALLEGRO_COLOR cor_texto = al_map_rgb(0, 0, 0);
@@ -42,7 +47,10 @@ void desenha_tabuleiro(ALLEGRO_FONT *font) {
 }
 
 void desenha_menu(ALLEGRO_FONT *font) {
-    ALLEGRO_COLOR branco = al_map_rgb(255, 255, 255); ALLEGRO_COLOR amarelo = al_map_rgb(255, 255, 0);
+    ALLEGRO_COLOR branco = al_map_rgb(255, 255, 255);
+    ALLEGRO_COLOR amarelo = al_map_rgb(255, 255, 0);
+    ALLEGRO_COLOR cinza = al_map_rgb(150, 150, 150);
+
     al_draw_filled_rectangle(150, 100, 650, 500, al_map_rgb(50, 50, 50));
     al_draw_rectangle(150, 100, 650, 500, branco, 2);
     al_draw_text(font, amarelo, 400, 150, ALLEGRO_ALIGN_CENTER, "AVENTURA DE TABULEIRO");
@@ -50,7 +58,7 @@ void desenha_menu(ALLEGRO_FONT *font) {
     al_draw_text(font, branco, 250, 300, ALLEGRO_ALIGN_LEFT, "2. CARREGAR JOGO SALVO");
     al_draw_text(font, branco, 250, 350, ALLEGRO_ALIGN_LEFT, "3. MELHORES SCORES");
     al_draw_text(font, branco, 250, 400, ALLEGRO_ALIGN_LEFT, "4. SAIR");
-    al_draw_text(font, al_map_rgb(150, 150, 150), 400, 450, ALLEGRO_ALIGN_CENTER, "Escolha uma opcao (1-4)...");
+    al_draw_text(font, cinza, 400, 450, ALLEGRO_ALIGN_CENTER, "Escolha uma opcao (1-4)...");
 }
 
 void desenha_hud(ALLEGRO_FONT *font, Jogador *j) {
@@ -64,7 +72,7 @@ void desenha_hud(ALLEGRO_FONT *font, Jogador *j) {
     ALLEGRO_COLOR cor_cinza = al_map_rgb(90, 90, 90);
     ALLEGRO_COLOR cor_verde = al_map_rgb(55, 205, 55);
       
-    int total_ataque = calcular_poder_total(j); 
+    int total_ataque = calcular_poder_total(j);
     
     al_draw_filled_rectangle(x_start - 5, 0, SCREEN_W, SCREEN_H, al_map_rgb(30, 30, 30));
     al_draw_line(x_start - 5, 0, x_start - 5, SCREEN_H, cor_branco, 3);

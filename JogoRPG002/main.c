@@ -65,10 +65,12 @@ int main() {
                 if (event.keyboard.keycode == ALLEGRO_KEY_SPACE) {
                     if (tabuleiro[jogador_principal.posicao_atual].tipo == CASA_BATALHA) {
                          if (calcular_poder_total(&jogador_principal) > tabuleiro[jogador_principal.posicao_atual].valor_evento) {
-                            avancar_passo(); 
+                            avancar_passo();
+                            processar_evento_casa();
                          }
                     } else {
-                         avancar_passo(); 
+                         avancar_passo();
+                         processar_evento_casa();
                     }
                 }
             }
@@ -97,7 +99,8 @@ int main() {
         if (estado_atual == ESTADO_MENU) {
             desenha_menu(font_padrao);
         } else if (estado_atual == ESTADO_EXPLORACAO || estado_atual == ESTADO_OPCAO_GEMA) {
-            desenha_tabuleiro(font_padrao); 
+            desenha_tabuleiro(font_padrao);
+            al_draw_text(font_padrao, al_map_rgb(255, 255, 255), 10, 60, 0, mensagem_evento);
             al_draw_textf(font_padrao, al_map_rgb(255, 255, 255), 10, 10, 0, "CASA %d", jogador_principal.posicao_atual + 1);
             al_draw_text(font_padrao, al_map_rgb(255, 255, 255), 10, 40, 0, tabuleiro[jogador_principal.posicao_atual].descricao);
             

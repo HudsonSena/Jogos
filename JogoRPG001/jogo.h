@@ -8,8 +8,8 @@
 #include <stdio.h> 
 
 // --- CONSTANTES DE JOGO E TELA ---
-#define MAX_VERTENTES 1
-#define TAMANHO_TABULEIRO 10
+#define MAX_VERTENTES 1         // Estritamente linear (usado apenas para o array Casa)
+#define TAMANHO_TABULEIRO 14    // Mapa expandido para 14 casas (0 a 13)
 #define SCREEN_W 800
 #define SCREEN_H 600
 #define HUD_X_START 650
@@ -23,7 +23,7 @@ typedef enum {
     ESTADO_MENU,
     ESTADO_EXPLORACAO,
     ESTADO_BATALHA,
-    ESTADO_OPCAO_GEMA,
+    ESTADO_OPCAO_GEMA,      
     ESTADO_HIGH_SCORES,
     ESTADO_SAIR
 } JOGO_ESTADO;
@@ -84,7 +84,7 @@ typedef struct {
     char nome[50];
     int vida;
     int ataque_base;
-    int poder_ganho_batalha;
+    int poder_ganho_batalha; // Poder permanente ganho com vitorias
     int moedas;
     int score;
     int posicao_atual;
@@ -95,14 +95,14 @@ typedef struct {
 
     Gema gemas_inventario[MAX_GEMAS];
     int num_gemas_inventario;
-    int poder_gema_ativo; 
+    int poder_gema_permanente; // Poder temporario concedido pela gema consumida
     
     int total_gemas; 
-    int armas_coletadas; 
+    int armas_coletadas;
 } Jogador;
 
 
-// --- PROTÓTIPOS DE FUNÇÕES (Permitem que main chame as implementações abaixo) ---
+// --- PROTÓTIPOS DE FUNÇÕES ---
 void desenha_tabuleiro(ALLEGRO_FONT *font);
 void desenha_menu(ALLEGRO_FONT *font);
 void desenha_hud(ALLEGRO_FONT *font, Jogador *j);
@@ -113,9 +113,10 @@ void desenha_menu_carregar_jogo();
 void atualizar_objetivos();
 void processar_evento_casa();
 int calcular_poder_total(const Jogador *j);
+void avancar_passo(); // Funcao simplificada para linearidade
+
 void carregar_high_scores(HighScore scores[]);
 void salvar_jogo(const JogoSalvo *jogo, int slot_index);
 int carregar_jogo(JogoSalvo *jogo, int slot_index);
-
 
 #endif // JOGO_H

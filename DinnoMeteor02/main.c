@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include "dinossauro.h"
 #include "meteoro.h"
+#include "item.h"
 
 // --- DIMENSÕES DA TELA ---
 #define LARGURA_TELA 800
@@ -195,7 +196,7 @@ void tratar_dano_meteoro(Dinossauro *dino, Meteoro *meteoro) {
         meteoro->velocidade_y = FORCA_IMPACTO_DESCENDENTE;
         // Aplica o Recuo Vertical. A constante DEVE ser um valor negativo alto (ex: -200.0)
         meteoro->y += METEORO_BOUNCE_DISPLACEMENT;
-        meteoro->velocidade_y = 2;
+        //meteoro->velocidade_y = 2;
         
         printf("Meteoro Nível %d cabeceado. Restam %d hits.\n", meteoro->nivel, meteoro->vida_atual - dano_real);
     }
@@ -291,11 +292,14 @@ int main() {
         // ... (tratar erro, desinicializar e retornar) ...
     }
 
+    Item itens[MAX_ITENS]; // Array de itens
+    double ultimo_tempo_item = 0.0; // Para controlar a geração periódica de itens
     // Inicializar Dinossauro
     dinossauro_inicializar(&dino, LARGURA_TELA / 4);
 
     // Inicializar Meteoros
     inicializar_meteoros(meteoros);
+    inicializar_itens(itens);
 
     ALLEGRO_EVENT_QUEUE *event_queue = al_create_event_queue();
     
@@ -370,6 +374,36 @@ int main() {
                 dinossauro_atualizar(&dino);
                 atualizar_meteoros(meteoros);
 
+                if (dino.tempo_bonus > 0) {
+                    dino.tempo_bonus -= (1.0 / FPS); // Decrementa o tempo restante
+                    if (dino.tempo_bonus <= 0) {
+                        dino.poder_bonus = 0; // Remove o bônus
+                        printf("Bônus expirou. Dinossauro normal.\n");
+                    }
+                }
+
+                atualizar_itens(itens);
+
+                if (tempo_atual - ultimo_tempo_item > TEMPO_ENTRE_GERACAO_ITENS) {
+                    // Decide qual bônus gerar (30% chance de Vida, 70% chance de Bônus de Poder)
+                    TipoItem item_a_gerar;
+                    int chance = rand() % 100;
+                    
+                    if (chance < 30) {
+                        item_a_gerar = ITEM_VIDA;
+                    } else if (chance < 70) {
+                        item_a_gerar = ITEM_BONUS_1; // Amarelo
+                    } else {
+                        item_a_gerar = ITEM_BONUS_2; // Vermelho
+                    }
+                    
+                    gerar_item(itens, item_a_gerar);
+                    ultimo_tempo_item = tempo_atual;
+                }
+
+                // 4. Colisão de Coleta de Itens
+                checar_coleta_item(&dino, itens);
+
                 int indice_meteoro_atingido = checar_colisao_com_cabeca(&dino, meteoros);
                         
                 if (indice_meteoro_atingido != -1) {
@@ -413,6 +447,11 @@ int main() {
                 desenhar_chao();
                 dinossauro_desenhar(&dino);
                 desenhar_meteoros(meteoros);
+                desenhar_itens(itens);
+                al_draw_textf(fonte_menu, al_map_rgb(255, 255, 255), 10, 10, 0, "Vida: %d", dino.vida);
+                if (dino.poder_bonus > 0) {
+                    al_draw_textf(fonte_menu, al_map_rgb(255, 255, 0), LARGURA_TELA - 10, 10, ALLEGRO_ALIGN_RIGHT, "BÔNUS: %.1fs", dino.tempo_bonus);
+                }
                 
             } else if (estado_atual == ESTADO_SAIR) {
                 rodando = 0;

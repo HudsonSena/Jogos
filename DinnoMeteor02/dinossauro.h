@@ -22,6 +22,7 @@ typedef struct {
     float dx;             // Velocidade horizontal (movimento)
     int vida;             // 0 a 100
     int poder_bonus;      // 0, 1 (Amarelo), 2 (Vermelho)
+    double tempo_bonus;
     int em_pulso;         // Flag booleana (1 se estiver pulando, 0 caso contrário)
     int no_chao;          // Flag booleana (1 se estiver no chão)
 } Dinossauro;

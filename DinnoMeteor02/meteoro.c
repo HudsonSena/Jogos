@@ -83,6 +83,8 @@ void gerar_novo_meteoro(Meteoro meteoros[], float dificuldade_fator) {
             
             // Aplica o fator de dificuldade à velocidade Y baseada no nível
             meteoros[i].velocidade_y *= dificuldade_fator;
+
+            meteoros[i].velocidade_y_base = meteoros[i].velocidade_y;
             
             return;
         }
@@ -92,10 +94,16 @@ void gerar_novo_meteoro(Meteoro meteoros[], float dificuldade_fator) {
 void atualizar_meteoros(Meteoro meteoros[]) {
     for (int i = 0; i < MAX_METEOROS; i++) {
         if (meteoros[i].ativo) {
-            // Move o meteoro para baixo
-            meteoros[i].y += meteoros[i].velocidade_y;
+            meteoros[i].velocidade_y += GRAVIDADE; 
             
-            // NOTA: A checagem de colisão com o chão será feita na função checar_e_tratar_chao.
+            // 2. NOVO: Checa se a velocidade é maior que a velocidade base.
+            // Se for, redefine para a velocidade base para evitar aceleração contínua.
+            if (meteoros[i].velocidade_y > meteoros[i].velocidade_y_base) {
+                meteoros[i].velocidade_y = meteoros[i].velocidade_y_base;
+            }
+            
+            // 3. Aplica o movimento
+            meteoros[i].y += meteoros[i].velocidade_y;
         }
     }
 }

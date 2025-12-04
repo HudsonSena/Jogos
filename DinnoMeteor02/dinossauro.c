@@ -13,6 +13,7 @@ void dinossauro_inicializar(Dinossauro *dino, float x_inicial) {
     dino->dx = 0.0;
     dino->vida = 100;
     dino->poder_bonus = 0;
+    dino->tempo_bonus = 0.0;
     dino->em_pulso = 0;
     dino->no_chao = 1;
 }

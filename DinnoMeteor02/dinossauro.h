@@ -25,6 +25,9 @@ typedef struct {
     double tempo_bonus;
     int em_pulso;         // Flag booleana (1 se estiver pulando, 0 caso contrário)
     int no_chao;          // Flag booleana (1 se estiver no chão)
+    int score;             // <<< CORRIGIDO: Adicionado o score
+    int fase_atual;        // <<< CORRIGIDO: Adicionada a fase atual
+    double tempo_fase;
 } Dinossauro;
 
 // --- ASSINATURAS DE FUNÇÕES ---

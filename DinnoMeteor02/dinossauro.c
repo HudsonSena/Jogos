@@ -16,6 +16,8 @@ void dinossauro_inicializar(Dinossauro *dino, float x_inicial) {
     dino->tempo_bonus = 0.0;
     dino->em_pulso = 0;
     dino->no_chao = 1;
+    dino->fase_atual = 1;
+    dino->score = 0;
 }
 
 void dinossauro_desenhar(Dinossauro *dino) {
@@ -25,7 +27,7 @@ void dinossauro_desenhar(Dinossauro *dino) {
     if (dino->poder_bonus == 1) { // Amarelo
         cor_dino = al_map_rgb(255, 255, 0);
     } else if (dino->poder_bonus == 2) { // Vermelho
-        cor_dino = al_map_rgb(255, 0, 0);
+        cor_dino = al_map_rgb(0, 0, 255);
     }
 
     // Desenha o retângulo do dinossauro

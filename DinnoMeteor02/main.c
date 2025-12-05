@@ -6,6 +6,7 @@
 #include "dinossauro.h"
 #include "meteoro.h"
 #include "item.h"
+#include "score.h"
 
 // --- DIMENSÕES DA TELA ---
 #define LARGURA_TELA 800
@@ -23,11 +24,14 @@ float dificuldade_fator = 1.0;
 ALLEGRO_DISPLAY *display = NULL;
 ALLEGRO_FONT *fonte_titulo = NULL;
 ALLEGRO_FONT *fonte_menu = NULL;
+ScoreEntry top_scores[MAX_SCORES];
+Meteoro meteoros[MAX_METEOROS];
 
 // --- ESTRUTURA E ESTADOS DE JOGO (como definido antes) ---
 typedef enum {
     ESTADO_MENU_PRINCIPAL,
     ESTADO_JOGO_ROLANDO,
+    ESTADO_MELHORES_SCORES,
     ESTADO_SAIR,
     // ... outros estados ...
 } GAME_STATE;
@@ -118,12 +122,10 @@ void gerenciar_input_menu(ALLEGRO_EVENT *ev) {
         if (modo_edicao_nome) {
             
             // Tecla ENTER: Finaliza a edição do nome e vai para a primeira opção do menu
-            if (ev->keyboard.keycode == ALLEGRO_KEY_ENTER) {
-                modo_edicao_nome = 0;
-                opcao_selecionada = 1;
-                
-            // Tecla BACKSPACE: Remove o último caractere
-            } else if (ev->keyboard.keycode == ALLEGRO_KEY_BACKSPACE) {
+            if (modo_edicao_nome && ev->keyboard.keycode == ALLEGRO_KEY_ENTER) {
+            modo_edicao_nome = 0;
+            return; // Impede que o ENTER ative a opção do menu imediatamente
+        } else if (ev->keyboard.keycode == ALLEGRO_KEY_BACKSPACE) {
                 if (strlen(nome_jogador) > 0) {
                     nome_jogador[strlen(nome_jogador) - 1] = '\0';
                 }
@@ -143,14 +145,15 @@ void gerenciar_input_menu(ALLEGRO_EVENT *ev) {
                     if (opcao_selecionada < 1) opcao_selecionada = 3;
                     break;
                 case ALLEGRO_KEY_ENTER:
-                    // ... Lógica de seleção (Inicia jogo/Scores/Sair)
-                    if (opcao_selecionada == 1) estado_atual = ESTADO_JOGO_ROLANDO; // Mudar para o jogo
-                if (opcao_selecionada == 2) {
-                    // Aqui sera implementada a logica para ir para a tela de scores
-                    printf("Opcao: Melhores Scores (Em Implementacao)\n");
-                }
-                if (opcao_selecionada == 3) estado_atual = ESTADO_SAIR; // Definir estado de saida
-                break;
+                    if (opcao_selecionada == 1) { 
+                        estado_atual = ESTADO_JOGO_ROLANDO; 
+                    } else if (opcao_selecionada == 2) {
+                        carregar_scores(top_scores);
+                        estado_atual = ESTADO_MELHORES_SCORES;
+                    } else if (opcao_selecionada == 3) { 
+                        estado_atual = ESTADO_SAIR; 
+                    }
+                    break;
             }
         }
     
@@ -168,6 +171,21 @@ void gerenciar_input_menu(ALLEGRO_EVENT *ev) {
             }
         }
     }
+}
+
+void desenhar_scores(ALLEGRO_FONT *font_menu, ALLEGRO_FONT *fonte_titulo, ScoreEntry top_scores[]) {
+    // ... (Código anterior) ...
+    for (int i = 0; i < MAX_SCORES; i++) {
+        char linha_score[100];
+        
+        // Exibe a Posição, Nome, Score e Fase Final.
+        // O nome é lido diretamente do arquivo binário.
+        snprintf(linha_score, 100, "%02d. %-15s - SCORE: %d (FASE %d)", 
+                 i + 1, top_scores[i].nome, top_scores[i].score, top_scores[i].fase_final);
+                 
+        al_draw_text(font_menu, al_map_rgb(200, 200, 255), LARGURA_TELA / 2, 120 + i * 40, ALLEGRO_ALIGN_CENTER, linha_score);
+    }
+    // ...
 }
 
 void tratar_dano_meteoro(Dinossauro *dino, Meteoro *meteoro) {
@@ -207,8 +225,15 @@ void tratar_dano_meteoro(Dinossauro *dino, Meteoro *meteoro) {
 
     if (meteoro->vida_atual <= 0) {
         meteoro->ativo = 0;
-        // Lógica de Score: Adicionar pontos
-        printf("Meteoro Nível %d destruído! Pontos Ganhos.\n", meteoro->nivel);
+        if (meteoro->nivel == 1) {
+            dino->score += PONTOS_POR_METEORO_NIVEL_1;
+        } else if (meteoro->nivel == 2) {
+            dino->score += PONTOS_POR_METEORO_NIVEL_2;
+        } else if (meteoro->nivel == 3) {
+            dino->score += PONTOS_POR_METEORO_NIVEL_3;
+        }
+        
+        printf("Meteoro Nível %d destruído! Score: %d\n", meteoro->nivel, dino->score);
     } 
     // Se a vida for maior que o dano (meteoro sobreviveu), a mensagem já foi impressa no bloco "if (meteoro->vida_atual > dano_real)".
 }
@@ -272,6 +297,26 @@ void desinicializar_allegro() {
     if (display) al_destroy_display(display);
 }
 
+// main.c (Ou onde você define suas funções de inicialização)
+
+void inicializar_novo_jogo(Dinossauro *dino, Meteoro meteoros[], Item itens[]) {
+    // 1. Inicializa o dinossauro (vida, posição, etc.)
+    dinossauro_inicializar(dino, LARGURA_TELA / 4.0);
+    
+    // 2. Garante que os valores de score e fase estão zerados
+    dino->score = 0;
+    dino->fase_atual = 1;
+    dino->tempo_fase = 0.0;
+    dino->vida = 100;
+    
+    // 3. Reinicializa os elementos de jogo (assumindo que você tem essas funções)
+    inicializar_meteoros(meteoros); 
+    inicializar_itens(itens); 
+
+    // 4. Garante que a próxima vez que voltar ao menu, pedirá o nome novamente.
+    modo_edicao_nome = 1; // Opcional, mas útil se você quiser que o nome seja re-digitado
+}
+
 int main() {
     if (!inicializar_allegro()) {
         desinicializar_allegro();
@@ -317,6 +362,13 @@ int main() {
 
     while (rodando) {
         al_wait_for_event(event_queue, &ev);
+
+        if (ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
+            if (estado_atual == ESTADO_MELHORES_SCORES) {
+                estado_atual = ESTADO_MENU_PRINCIPAL; 
+                modo_edicao_nome = 1; // Permite re-entrada de nome
+            }
+        }
 
         // ----------------------------------------
         // A. Processamento de Eventos
@@ -373,6 +425,19 @@ int main() {
                 // 1. Atualizar Dinossauro e Meteoros
                 dinossauro_atualizar(&dino);
                 atualizar_meteoros(meteoros);
+
+                if (dino.vida <= 0) {                    
+                    // 1. Salva o score e verifica se ele entra no Top 10
+                    atualizar_e_salvar_score(nome_jogador, dino.score, dino.fase_atual);
+                    
+                    // 2. Carrega o ranking ATUALIZADO para exibição
+                    carregar_scores(top_scores);
+                    
+                    // 3. Mude o estado para a tela de scores
+                    estado_atual = ESTADO_MELHORES_SCORES;
+
+                    redesenhar = 1;
+                }
 
                 if (dino.tempo_bonus > 0) {
                     dino.tempo_bonus -= (1.0 / FPS); // Decrementa o tempo restante
@@ -452,8 +517,18 @@ int main() {
                 if (dino.poder_bonus > 0) {
                     al_draw_textf(fonte_menu, al_map_rgb(255, 255, 0), LARGURA_TELA - 10, 10, ALLEGRO_ALIGN_RIGHT, "BÔNUS: %.1fs", dino.tempo_bonus);
                 }
+
+                al_draw_textf(fonte_menu, al_map_rgb(255, 255, 255), LARGURA_TELA - 10, 10, ALLEGRO_ALIGN_RIGHT, "SCORE: %d", dino.score);
+                al_draw_textf(fonte_menu, al_map_rgb(255, 255, 255), LARGURA_TELA - 10, 35, ALLEGRO_ALIGN_RIGHT, "FASE: %d", dino.fase_atual);
+
+                // 3. Nome do Jogador (Centro Superior)
+                al_draw_textf(fonte_menu, al_map_rgb(255, 255, 255), LARGURA_TELA / 2, 10, ALLEGRO_ALIGN_CENTER, "JOGADOR: %s", nome_jogador);
                 
-            } else if (estado_atual == ESTADO_SAIR) {
+            } else if (estado_atual == ESTADO_MELHORES_SCORES) {
+                al_clear_to_color(al_map_rgb(0, 0, 0)); // Fundo preto
+                desenhar_scores(fonte_menu, fonte_titulo, top_scores);
+            }
+            else if (estado_atual == ESTADO_SAIR) {
                 rodando = 0;
             }
             

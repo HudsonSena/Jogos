@@ -20,17 +20,21 @@ int modo_edicao_nome = 1;          // NOVO: 1 se estiver editando, 0 caso contr�
 int max_caracteres_nome = 15;      // Limite de caracteres para o nome
 double ultimo_tempo_meteoro = 0.0;
 float dificuldade_fator = 1.0;
+float transicao_timer = 0.0;
 // --- VARIÁVEIS DO ALLEGRO ---
 ALLEGRO_DISPLAY *display = NULL;
 ALLEGRO_FONT *fonte_titulo = NULL;
 ALLEGRO_FONT *fonte_menu = NULL;
 ScoreEntry top_scores[MAX_SCORES];
 Meteoro meteoros[MAX_METEOROS];
+extern Meteoro meteoros[];
 
 // --- ESTRUTURA E ESTADOS DE JOGO (como definido antes) ---
 typedef enum {
     ESTADO_MENU_PRINCIPAL,
+    ESTADO_INPUT_NOME,
     ESTADO_JOGO_ROLANDO,
+    ESTADO_TRANSICAO_FASE,
     ESTADO_MELHORES_SCORES,
     ESTADO_SAIR,
     // ... outros estados ...
@@ -41,6 +45,48 @@ GAME_STATE estado_atual = ESTADO_MENU_PRINCIPAL;
 // -----------------------------------------------------------------------------
 // FUNÇÕES DE DESENHO
 // -----------------------------------------------------------------------------
+
+// main.c (Nova função)
+
+void inicializar_novo_jogo(Dinossauro *dino, Meteoro meteoros[], Item itens[]);
+void gerenciar_input_menu(ALLEGRO_EVENT *ev, Dinossauro *dino, Meteoro meteoros[], Item itens[]);
+//void aumentar_dificuldade(Dinossauro *dino);
+void aumentar_dificuldade(Dinossauro *dino) {
+    limpar_meteoros(meteoros);
+    
+    dificuldade_fator += FATOR_ACELERACAO;
+    dino->fase_atual++;
+    dino->tempo_fase = 0.0;
+    
+    transicao_timer = TEMPO_TRANSICAO;
+    estado_atual = ESTADO_TRANSICAO_FASE;
+
+    printf("--- MUDANCA DE FASE! ---\n");
+    printf("Nova Fase: %d | Fator Dificuldade: %.2f\n", dino->fase_atual, dificuldade_fator);
+}
+
+void desenhar_input_nome() {
+    al_clear_to_color(al_map_rgb(10, 10, 20));
+    ALLEGRO_COLOR cor_texto = al_map_rgb(255, 255, 255); 
+    ALLEGRO_COLOR cor_nome_input = al_map_rgb(255, 255, 0);
+
+    // Título
+    al_draw_text(fonte_titulo, cor_nome_input, LARGURA_TELA / 2, ALTURA_TELA / 2 - 100, ALLEGRO_ALIGN_CENTER, "ENTRADA DE JOGADOR");
+
+    // Lógica do Cursor Piscante
+    char texto_input[50];
+    if (((int)(al_get_time() * 2)) % 2 == 0) {
+        sprintf(texto_input, "NOME: %s|", nome_jogador);
+    } else {
+        sprintf(texto_input, "NOME: %s", nome_jogador);
+    }
+    
+    // Desenha o input
+    al_draw_text(fonte_menu, cor_texto, LARGURA_TELA / 2, ALTURA_TELA / 2, ALLEGRO_ALIGN_CENTER, texto_input);
+    
+    // Dica de navegação
+    al_draw_text(fonte_menu, al_map_rgb(150, 150, 150), LARGURA_TELA / 2, ALTURA_TELA / 2 + 50, ALLEGRO_ALIGN_CENTER, "Pressione ENTER para iniciar.");
+}
 
 void desenhar_menu_principal() {
     // 1. Fundo Preto
@@ -74,21 +120,6 @@ void desenhar_menu_principal() {
     // Posição Y inicial para as opções
     int y_pos = ret_y1 + 120;
     int espaco_y = 50;
-
-    // --- Caixa para Nome ---
-    // --- Caixa para Nome ---
-    char texto_nome[50];
-    // Se estiver editando, adicione um marcador visual no texto
-    if (modo_edicao_nome && ((int)(al_get_time() * 2)) % 2 == 0) { // Cursor piscando
-        sprintf(texto_nome, "Nome: %s|", nome_jogador);
-    } else {
-        sprintf(texto_nome, "Nome: %s", nome_jogador);
-    }
-    
-    // Alerta visual de que está na caixa de texto
-    ALLEGRO_COLOR cor_nome = modo_edicao_nome ? cor_texto_selecionado : cor_texto_normal;
-
-    al_draw_text(fonte_menu, cor_nome, LARGURA_TELA / 2, y_pos, ALLEGRO_ALIGN_CENTER, texto_nome);
     
     // Dica de navegação
     if (modo_edicao_nome) {
@@ -113,28 +144,11 @@ void desenhar_menu_principal() {
     al_draw_text(fonte_menu, cor_opt3, LARGURA_TELA / 2, y_pos, ALLEGRO_ALIGN_CENTER, "3. SAIR");
 }
 
-void gerenciar_input_menu(ALLEGRO_EVENT *ev) {
+void gerenciar_input_menu(ALLEGRO_EVENT *ev, Dinossauro *dino, Meteoro meteoros[], Item itens[]) { // Lembre-se de passar dino
     if (ev->type == ALLEGRO_EVENT_KEY_DOWN) {
-        
-        // ------------------------------------
-        // MODO EDIÇÃO DE NOME (quando modo_edicao_nome é 1)
-        // ------------------------------------
-        if (modo_edicao_nome) {
-            
-            // Tecla ENTER: Finaliza a edição do nome e vai para a primeira opção do menu
-            if (modo_edicao_nome && ev->keyboard.keycode == ALLEGRO_KEY_ENTER) {
-            modo_edicao_nome = 0;
-            return; // Impede que o ENTER ative a opção do menu imediatamente
-        } else if (ev->keyboard.keycode == ALLEGRO_KEY_BACKSPACE) {
-                if (strlen(nome_jogador) > 0) {
-                    nome_jogador[strlen(nome_jogador) - 1] = '\0';
-                }
-            }
-            
-        // ------------------------------------
-        // MODO NAVEGAÇÃO (quando modo_edicao_nome é 0)
-        // ------------------------------------
-        } else {
+
+        // --- 1. ESTADO DE NAVEGAÇÃO DO MENU PRINCIPAL ---
+        if (estado_atual == ESTADO_MENU_PRINCIPAL) {
             switch (ev->keyboard.keycode) {
                 case ALLEGRO_KEY_DOWN:
                     opcao_selecionada++;
@@ -144,9 +158,13 @@ void gerenciar_input_menu(ALLEGRO_EVENT *ev) {
                     opcao_selecionada--;
                     if (opcao_selecionada < 1) opcao_selecionada = 3;
                     break;
+                // ... (UP/DOWN logic) ...
                 case ALLEGRO_KEY_ENTER:
                     if (opcao_selecionada == 1) { 
-                        estado_atual = ESTADO_JOGO_ROLANDO; 
+                        // Mudar para o estado de INPUT DO NOME
+                        estado_atual = ESTADO_INPUT_NOME; 
+                        // Resetamos o modo_edicao_nome para 1 (ativado)
+                        modo_edicao_nome = 1; 
                     } else if (opcao_selecionada == 2) {
                         carregar_scores(top_scores);
                         estado_atual = ESTADO_MELHORES_SCORES;
@@ -155,14 +173,28 @@ void gerenciar_input_menu(ALLEGRO_EVENT *ev) {
                     }
                     break;
             }
+        
+        // --- 2. ESTADO DE INPUT DO NOME (processa ENTER e BACKSPACE) ---
+        } else if (estado_atual == ESTADO_INPUT_NOME) {
+            if (ev->keyboard.keycode == ALLEGRO_KEY_ENTER) {
+                // Se ENTER no INPUT, inicia o jogo!
+                inicializar_novo_jogo(dino, meteoros, itens); // Reset
+                estado_atual = ESTADO_JOGO_ROLANDO; 
+                modo_edicao_nome = 0; // Desativa a edição
+            } else if (ev->keyboard.keycode == ALLEGRO_KEY_BACKSPACE) {
+                if (strlen(nome_jogador) > 0) {
+                    nome_jogador[strlen(nome_jogador) - 1] = '\0';
+                }
+            }
         }
     
     // ------------------------------------
     // MODO EDIÇÃO DE NOME (Input de caracteres)
     // ------------------------------------
     } else if (ev->type == ALLEGRO_EVENT_KEY_CHAR) {
-        if (modo_edicao_nome) {
-            // Certifica-se de que é um caractere imprimível e há espaço
+        // A digitação agora só é permitida no estado ESTADO_INPUT_NOME
+        if (estado_atual == ESTADO_INPUT_NOME) { 
+            // Sua lógica de entrada de caracteres permanece aqui...
             if (ev->keyboard.unichar >= ' ' && ev->keyboard.unichar <= '~' && strlen(nome_jogador) < max_caracteres_nome) {
                 char ch = ev->keyboard.unichar;
                 size_t len = strlen(nome_jogador);
@@ -186,6 +218,44 @@ void desenhar_scores(ALLEGRO_FONT *font_menu, ALLEGRO_FONT *fonte_titulo, ScoreE
         al_draw_text(font_menu, al_map_rgb(200, 200, 255), LARGURA_TELA / 2, 120 + i * 40, ALLEGRO_ALIGN_CENTER, linha_score);
     }
     // ...
+}
+
+void renderizar_transicao_fase(ALLEGRO_FONT *font, int fase_atual, float dificuldade_fator) {
+    // Fundo semitransparente para focar na mensagem
+    al_draw_filled_rectangle(0, 0, LARGURA_TELA, ALTURA_TELA, al_map_rgba(0, 0, 0, 200)); 
+    
+    // Cor amarela/branca para destaque
+    ALLEGRO_COLOR cor_texto = al_map_rgb(255, 255, 0); 
+    
+    char msg_titulo[50];
+    sprintf(msg_titulo, "FASE %d CONCLUÍDA!", fase_atual - 1); 
+
+    char msg_proxima[50];
+    sprintf(msg_proxima, "INICIANDO FASE %d", fase_atual);
+    
+    // Calcula a porcentagem total de aumento
+    float aumento_total = (dificuldade_fator - 1.0) * 100;
+    char msg_dificuldade[50];
+    sprintf(msg_dificuldade, "Velocidade: +%.0f%%", aumento_total);
+
+    // Desenha as mensagens no centro
+    al_draw_text(font, cor_texto, LARGURA_TELA / 2, ALTURA_TELA / 2 - 50,
+                 ALLEGRO_ALIGN_CENTER, msg_titulo);
+                 
+    al_draw_text(font, al_map_rgb(255, 255, 255), LARGURA_TELA / 2, ALTURA_TELA / 2,
+                 ALLEGRO_ALIGN_CENTER, msg_proxima);
+                 
+    al_draw_text(font, al_map_rgb(100, 255, 100), LARGURA_TELA / 2, ALTURA_TELA / 2 + 50,
+                 ALLEGRO_ALIGN_CENTER, msg_dificuldade);
+}
+
+void limpar_meteoros(Meteoro meteoros[]) {
+    for (int i = 0; i < MAX_METEOROS; i++) {
+        // Se o meteoro estiver ativo, desative-o
+        if (meteoros[i].ativo) {
+            meteoros[i].ativo = 0;
+        }
+    }
 }
 
 void tratar_dano_meteoro(Dinossauro *dino, Meteoro *meteoro) {
@@ -376,9 +446,10 @@ int main() {
         
         if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
             rodando = 0;            
-        } else if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
-            if (estado_atual == ESTADO_MENU_PRINCIPAL) {
-                gerenciar_input_menu(&ev);
+        } 
+        else if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
+            if (estado_atual == ESTADO_MENU_PRINCIPAL || estado_atual == ESTADO_INPUT_NOME) {
+                gerenciar_input_menu(&ev, &dino, meteoros, itens);
             } else if (estado_atual == ESTADO_JOGO_ROLANDO) {
                 switch (ev.keyboard.keycode) {
                     case ALLEGRO_KEY_SPACE:
@@ -392,7 +463,8 @@ int main() {
                         break;
                 }
             }
-        } else if (ev.type == ALLEGRO_EVENT_KEY_UP) { // NOVO BLOCO: PARAR MOVIMENTO
+        } 
+        else if (ev.type == ALLEGRO_EVENT_KEY_UP) { // NOVO BLOCO: PARAR MOVIMENTO
             if (estado_atual == ESTADO_JOGO_ROLANDO) {
                 // Zera o dx se a tecla de movimento for solta
                 switch (ev.keyboard.keycode) {
@@ -406,21 +478,28 @@ int main() {
                         break;
                 }
             }
-        } else if (ev.type == ALLEGRO_EVENT_KEY_CHAR && estado_atual == ESTADO_MENU_PRINCIPAL) {
-            // Garante que a digitação do nome só ocorra no menu
-            gerenciar_input_menu(&ev);
+        } else if (ev.type == ALLEGRO_EVENT_KEY_CHAR) {
+            if (estado_atual == ESTADO_INPUT_NOME) { // Adicione esta verificação de estado
+                gerenciar_input_menu(&ev, &dino, meteoros, itens);
+            }
 
         } else if (ev.type == ALLEGRO_EVENT_TIMER) {
             // ----------------------------------------
             // B. Lógica de Atualização (ACIONADA PELO TIMER)
             // ----------------------------------------
             double tempo_atual = al_get_time();
+            int score_limite;
             // Verifique se a condição abaixo está correta e se o tempo está passando.
-            if (tempo_atual - ultimo_tempo_meteoro > (1.5 + (rand() % 150) / 100.0) ) { 
-                gerar_novo_meteoro(meteoros, dificuldade_fator);
-                ultimo_tempo_meteoro = tempo_atual;
-            }
+            
             if (estado_atual == ESTADO_JOGO_ROLANDO) {
+                score_limite = dino.fase_atual * PONTOS_POR_FASE;
+                if (tempo_atual - ultimo_tempo_meteoro > (1.5 + (rand() % 150) / 100.0) ) { 
+                    gerar_novo_meteoro(meteoros, dificuldade_fator);
+                    ultimo_tempo_meteoro = tempo_atual;
+                }
+                if (dino.score >= score_limite) {
+                    aumentar_dificuldade(&dino);
+                }                
                 // Chama a lógica de movimento do Dinossauro e aplica a gravidade
                 // 1. Atualizar Dinossauro e Meteoros
                 dinossauro_atualizar(&dino);
@@ -485,14 +564,22 @@ int main() {
                     }
                 }
 
-                // 3. Lógica de Geração de Meteoros
-                // ... (Manter a lógica de geração anterior, usando dificuldade_fator)
+                score_limite = dino.fase_atual * PONTOS_POR_FASE;
+                if (dino.score >= score_limite) {
+                    aumentar_dificuldade(&dino);
+                    redesenhar = 1; // Força a renderização imediata da tela de transição
+                }
+            } 
+            
+            else if (estado_atual == ESTADO_TRANSICAO_FASE) {
+                // Diminui o timer pelo tempo do frame (1/FPS)
+                transicao_timer -= 1.0 / FPS; 
                 
-                // 4. Aumentar Dificuldade (Exemplo: aumenta o fator a cada 10 segundos)
-                // dificuldade_fator = 1.0 + (al_get_time() / 100.0);
+                if (transicao_timer <= 0.0) {
+                    estado_atual = ESTADO_JOGO_ROLANDO; // Transição acabou, volta ao jogo!
+                }
             }
             redesenhar = 1; // Sinaliza que o desenho deve ocorrer
-
         } 
 
         // ----------------------------------------
@@ -505,7 +592,11 @@ int main() {
             if (estado_atual == ESTADO_MENU_PRINCIPAL) {
                 desenhar_menu_principal();
                 
-            } else if (estado_atual == ESTADO_JOGO_ROLANDO) {
+            } else if (estado_atual == ESTADO_INPUT_NOME) { // NOVO ESTADO
+                desenhar_input_nome();
+            }
+            
+            else if (estado_atual == ESTADO_JOGO_ROLANDO) {
                 al_clear_to_color(al_map_rgb(0, 0, 0)); // Fundo preto
                 
                 // Desenha o chão e o dinossauro
@@ -515,7 +606,7 @@ int main() {
                 desenhar_itens(itens);
                 al_draw_textf(fonte_menu, al_map_rgb(255, 255, 255), 10, 10, 0, "Vida: %d", dino.vida);
                 if (dino.poder_bonus > 0) {
-                    al_draw_textf(fonte_menu, al_map_rgb(255, 255, 0), LARGURA_TELA - 10, 10, ALLEGRO_ALIGN_RIGHT, "BÔNUS: %.1fs", dino.tempo_bonus);
+                    al_draw_textf(fonte_menu, al_map_rgb(255, 255, 0), LARGURA_TELA - 10, 60, ALLEGRO_ALIGN_RIGHT, "BÔNUS: %.1fs", dino.tempo_bonus);
                 }
 
                 al_draw_textf(fonte_menu, al_map_rgb(255, 255, 255), LARGURA_TELA - 10, 10, ALLEGRO_ALIGN_RIGHT, "SCORE: %d", dino.score);
@@ -524,7 +615,14 @@ int main() {
                 // 3. Nome do Jogador (Centro Superior)
                 al_draw_textf(fonte_menu, al_map_rgb(255, 255, 255), LARGURA_TELA / 2, 10, ALLEGRO_ALIGN_CENTER, "JOGADOR: %s", nome_jogador);
                 
-            } else if (estado_atual == ESTADO_MELHORES_SCORES) {
+            } 
+            
+            else if (estado_atual == ESTADO_TRANSICAO_FASE) {
+                // Renderiza a sobreposição da tela de transição
+                renderizar_transicao_fase(fonte_menu, dino.fase_atual, dificuldade_fator);
+            }
+
+            else if (estado_atual == ESTADO_MELHORES_SCORES) {
                 al_clear_to_color(al_map_rgb(0, 0, 0)); // Fundo preto
                 desenhar_scores(fonte_menu, fonte_titulo, top_scores);
             }

@@ -34,6 +34,7 @@ typedef struct {
 } Meteoro;
 
 // --- ASSINATURAS DE FUNÇÕES ---
+void limpar_meteoros(Meteoro meteoros[]);
 
 void inicializar_meteoros(Meteoro meteoros[]);
 // Gera novo meteoro, escolhendo o nível baseado na dificuldade ou sorte

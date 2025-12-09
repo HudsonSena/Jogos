@@ -6,13 +6,13 @@
 #include "config.h" 
 
 // --- CONSTANTES ---
-#define MAX_ITENS 3
+#define MAX_ITENS 4
 #define ITEM_LARGURA 30
 #define ITEM_ALTURA 30
 #define VELOCIDADE_QUEDA_ITEM 3.0
 #define DANO_VIDA_RECUPERADA 25          // +25% de vida
 #define DURACAO_BONUS_SEGUNDOS 15.0     // 15 segundos de bônus
-#define TEMPO_ENTRE_GERACAO_ITENS 60.0  // 1 minuto (60 segundos)
+#define TEMPO_ENTRE_GERACAO_ITENS 30.0  // 1 minuto (60 segundos)
 
 // --- TIPOS DE ITEM ---
 typedef enum {

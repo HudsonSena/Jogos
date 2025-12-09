@@ -68,6 +68,14 @@ void gerar_novo_meteoro(Meteoro meteoros[], float dificuldade_fator) {
             
             // 2. Configura as propriedades baseadas no nível
             configurar_meteoro_por_nivel(&meteoros[i]);
+
+            // 3. Salva a velocidade base do Nível ANTES de aplicar o fator da fase
+            meteoros[i].velocidade_y_base = meteoros[i].velocidade_y;
+            
+            // 4. APLICA A DIFICULDADE DA FASE
+            // A velocidade y final é a velocidade do nível multiplicada pela dificuldade global.
+            // CORRIGIDO: Esta é a velocidade que será usada no jogo.
+            meteoros[i].velocidade_y *= dificuldade_fator;
             
             // 3. Posição e Ativação
             meteoros[i].ativo = 1;
@@ -80,11 +88,6 @@ void gerar_novo_meteoro(Meteoro meteoros[], float dificuldade_fator) {
             meteoros[i].x = margem + (rand() % largura_segura); 
             // Posição Y: Começa no topo (fora da tela)
             meteoros[i].y = -(rand() % 200) - METEORO_ALTURA;
-            
-            // Aplica o fator de dificuldade à velocidade Y baseada no nível
-            meteoros[i].velocidade_y *= dificuldade_fator;
-
-            meteoros[i].velocidade_y_base = meteoros[i].velocidade_y;
             
             return;
         }

@@ -63,7 +63,7 @@ void desenhar_itens(Item itens[]) {
                     cor = al_map_rgb(255, 255, 0); // Amarelo para Bônus 1
                     break;
                 case ITEM_BONUS_2:
-                    cor = al_map_rgb(255, 0, 0); // Vermelho para Bônus 2
+                    cor = al_map_rgb(0, 0, 255); // Vermelho para Bônus 2
                     break;
                 default:
                     cor = al_map_rgb(255, 255, 255);

@@ -10,4 +10,8 @@
 // ALTURA_CHAO deve ser calculada aqui ou baseada nessas constantes
 #define ALTURA_CHAO (ALTURA_TELA - 100) 
 
+#define PONTOS_POR_FASE 300.0   // A cada 200 pontos, a dificuldade aumenta
+#define FATOR_ACELERACAO 0.30   // Aumenta a velocidade dos meteoros em 30% a cada fase
+#define TEMPO_TRANSICAO 3.0
+
 #endif // CONFIG_H

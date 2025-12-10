@@ -2,6 +2,7 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_image.h>
 #include <stdio.h>
 #include "dinossauro.h"
 #include "meteoro.h"
@@ -262,6 +263,11 @@ int inicializar_allegro() {
     }
     if (!al_install_keyboard()) {
         fprintf(stderr, "Falha ao inicializar o teclado.\n");
+        return 0;
+    }
+
+    if(!al_init_image_addon()) {
+        fprintf(stderr, "Falha ao iniciar imagens");
         return 0;
     }
 

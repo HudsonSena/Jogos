@@ -1,5 +1,3 @@
-// score.h
-
 #ifndef SCORE_H
 #define SCORE_H
 
@@ -15,4 +13,4 @@ typedef struct {
 void carregar_scores(ScoreEntry top_scores[]);
 void atualizar_e_salvar_score(const char *nome_jogador, int novo_score, int fase_final);
 
-#endif // SCORE_H
+#endif

@@ -5,7 +5,7 @@ Jogo em linguagem C e Allegro 5, sobre o dinossauro de come meteoros.
 
 ## Stack utilizada
 
-**Linguagem C** : Desenvolvimento de Struct, Estados Variaveis e constantes.
+**Linguagem C** : Desenvolvimento de Struct, Estados, Variaveis e constantes.
 
 **Allegro 5** : Desenvolvimento de Cores, sprites, imagens, frames, sons e outros.
 

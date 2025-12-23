@@ -171,6 +171,8 @@ void desenhar_scores(ALLEGRO_FONT *font_menu, ALLEGRO_FONT *fonte_titulo, ScoreE
     for (int i = 0; i < MAX_SCORES; i++) {
         char linha_score[100];
 
+        al_draw_text(fonte_menu, al_map_rgb(200, 200, 255), LARGURA_TELA / 2, 520, ALLEGRO_ALIGN_CENTER, "Pressione ESC para sair");
+
         snprintf(linha_score, 100, "%02d. %-15s - SCORE: %d (FASE %d)", i + 1, top_scores[i].nome, top_scores[i].score, top_scores[i].fase_final);
                  
         al_draw_text(font_menu, al_map_rgb(200, 200, 255), LARGURA_TELA / 2, 120 + i * 40, ALLEGRO_ALIGN_CENTER, linha_score);

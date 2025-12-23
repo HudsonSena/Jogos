@@ -14,15 +14,22 @@ void dinossauro_inicializar(Dinossauro *dino, float x_inicial) {
     dino->no_chao = 1;
     dino->fase_atual = 1;
     dino->score = 0;
+    dino->cor = 1;
 }
 
 void dinossauro_desenhar(Dinossauro *dino) {
     ALLEGRO_COLOR cor_dino = al_map_rgb(0, 150, 0);
+    //implementar sprites
+    //al_draw_bitmap_region(sprite, 160 * (int)frame, current_frame_y, 160, 160, pos_x, pos_y, 0);
 
     if (dino->poder_bonus == 1) {
+        dino->cor = 2;
         cor_dino = al_map_rgb(255, 255, 0);
+        //return cor_dino;
     } else if (dino->poder_bonus == 2) {
+        dino->cor = 3;
         cor_dino = al_map_rgb(0, 0, 255);
+        //return cor_dino;
     }
 
     al_draw_filled_rectangle(dino->x, dino->y, 

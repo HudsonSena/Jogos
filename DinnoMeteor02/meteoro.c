@@ -119,14 +119,14 @@ int checar_colisao_com_cabeca(Dinossauro *dino, Meteoro meteoros[]) {
 }
 
 void desenhar_meteoros(Meteoro meteoros[]) {
-    ALLEGRO_BITMAP* meteor = al_load_bitmap("./assets/meteoros/meteoro001.png");
+    
     for (int i = 0; i < MAX_METEOROS; i++) {
         if (meteoros[i].ativo) {
-            ALLEGRO_COLOR cor_meteoro = al_map_rgb(150, 150, 150);
+            ALLEGRO_BITMAP* meteor = al_load_bitmap("./assets/meteoros/meteoro001.png");
             
             // Mude a cor/visual conforme o nível
-            if (meteoros[i].nivel == 2) cor_meteoro = al_map_rgb(200, 100, 0);
-            if (meteoros[i].nivel == 3) cor_meteoro = al_map_rgb(200, 0, 0);
+            if (meteoros[i].nivel == 2) meteor = al_load_bitmap("./assets/meteoros/meteoro002.png");
+            if (meteoros[i].nivel == 3) meteor = al_load_bitmap("./assets/meteoros/meteoro003.png");
 
             //al_draw_filled_rectangle(meteoros[i].x, meteoros[i].y, meteoros[i].x + METEORO_LARGURA, meteoros[i].y + METEORO_ALTURA, cor_meteoro);
             al_draw_bitmap_region(meteor, 0, 0, 80, 60, meteoros[i].x, meteoros[i].y, 0);

@@ -43,22 +43,22 @@ void atualizar_itens(Item itens[]) {
 void desenhar_itens(Item itens[]) {
     for (int i = 0; i < MAX_ITENS; i++) {
         if (itens[i].ativo) {
-            ALLEGRO_COLOR cor;
+            ALLEGRO_BITMAP* bonus;
             switch (itens[i].tipo) {
                 case ITEM_VIDA:
-                    cor = al_map_rgb(0, 255, 0);
+                    bonus = al_load_bitmap("./assets/vida.png");
                     break;
                 case ITEM_BONUS_1:
-                    cor = al_map_rgb(255, 255, 0);
+                    bonus = al_load_bitmap("./assets/bonusAmarelo.png");
                     break;
                 case ITEM_BONUS_2:
-                    cor = al_map_rgb(0, 0, 255);
+                    bonus = al_load_bitmap("./assets/bonusAzul.png");
                     break;
                 default:
-                    cor = al_map_rgb(255, 255, 255);
+                    bonus = al_load_bitmap("./assets/vida.png");
                     break;
             }
-            al_draw_filled_rectangle(itens[i].x, itens[i].y, itens[i].x + ITEM_LARGURA, itens[i].y + ITEM_ALTURA, cor);
+            al_draw_bitmap_region(bonus, 0, 0, 80, 60, itens[i].x, itens[i].y, 0);
         }
     }
 }

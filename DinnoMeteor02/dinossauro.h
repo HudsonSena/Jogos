@@ -23,6 +23,7 @@ typedef struct {
     int no_chao;
     int score;
     int fase_atual;
+    int cor;
     double tempo_fase;
 } Dinossauro;
 

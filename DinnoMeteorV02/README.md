@@ -41,9 +41,7 @@ passos de instalação
     Instale seguindo as instruções padrão.
     Ao final, abra o terminal MSYS2 MSYS (geralmente com ícone roxo). Use este terminal apenas para a atualização inicial do sistema.
     Execute o comando:
-    ```bash
-    pacman -Syu
-    ```
+    <code>pacman -Syu<code>
     
     AVISO IMPORTANTE:</strong> Durante o comando <code>pacman -Syu</code>, é normal que o terminal peça para ser fechado no meio do processo. Se isso acontecer, <strong>feche a janela, abra o mesmo terminal MSYS2 MSYS novamente e execute o comando <code>pacman -Syu</code> mais uma vez</strong> para garantir que a atualização seja concluída.
     

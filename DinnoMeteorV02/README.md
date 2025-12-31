@@ -36,22 +36,22 @@ Esta é a base do nosso ambiente. Você só precisa fazer isso uma vez. A ferram
 
 passos de instalação
 
-  1. **Instalar o MSYS2 e Atualizar**
-    Vá para no [Site Oficial do MSyS2](https://www.msys2.org/) e baixe o instalador.
-    Instale seguindo as instruções padrão.
-    Ao final, abra o terminal MSYS2 MSYS (geralmente com ícone roxo). Use este terminal apenas para a atualização inicial do sistema.
-    Execute o comando:
-    <code>pacman -Syu<code>
+1.  **Instalar o MSYS2 e Atualizar**
+  Vá para no [Site Oficial do MSyS2](https://www.msys2.org/) e baixe o instalador.
+  Instale seguindo as instruções padrão.
+  Ao final, abra o terminal MSYS2 MSYS (geralmente com ícone roxo). Use este terminal apenas para a atualização inicial do sistema.
+  Execute o comando:
+  <code>pacman -Syu<code>
     
   AVISO IMPORTANTE: Durante o comando <code>pacman -Syu</code>, é normal que o terminal peça para ser fechado no meio do processo. Se isso acontecer, feche a janela, abra o mesmo terminal MSYS2 MSYS novamente e execute o comando <code>pacman -Syu</code> mais uma vezpara garantir que a atualização seja concluída.
     
 
-  2. **Instalar o Compilador GCC e o Allegro 5**
-    A partir de agora, para todo o resto, use sempre o terminal MSYS2 MINGW64 (geralmente com ícone azul). Ele é a sua bancada de trabalho principal para programar.
+2.  **Instalar o Compilador GCC e o Allegro 5**
+  A partir de agora, para todo o resto, use sempre o terminal MSYS2 MINGW64 (geralmente com ícone azul). Ele é a sua bancada de trabalho principal para programar.
     
   Execute o comando abaixo para instalar de uma só vez o compilador, as ferramentas e a biblioteca Allegro 5:
-    <pre><code>pacman -S --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-pkg-config mingw-w64-x86_64-allegro</code></pre>
-    O <code>pacman</code> cuidará de todas as dependências automaticamente.
+  <pre><code>pacman -S --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-pkg-config mingw-w64-x86_64-allegro</code></pre>
+  O <code>pacman</code> cuidará de todas as dependências automaticamente.
 
 Com o ambiente configurado, você está pronto para compilar qualquer projeto Allegro.
 
